@@ -24,7 +24,7 @@ for i in range(4):
     image = cv2.resize(image, (240, 240))
     cv2.imshow("test", image)
     cv2.waitKey()
-    filepath = 'img'
+    filepath = f'resources/img{i}.png'
     cv2.imwrite(filepath, image)
 
 '''
