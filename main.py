@@ -1,11 +1,9 @@
-from ximea import xiapi
+# from ximea import xiapi
 import cv2
 
-
 # create instance for first connected camera
-#cam = xiapi.Camera()
-cam=cv2.VideoCapture(0)
-
+# cam = xiapi.Camera()
+cam = cv2.VideoCapture(0)
 
 # print("Open Camera")
 #
@@ -19,14 +17,15 @@ cam=cv2.VideoCapture(0)
 # cam.start_acquisition()
 
 for i in range(4):
-    ret,image=cam.read()
-    #cam.get_image(img)
+    ret, image = cam.read()
+    # cam.get_image(img)
 
-    #image = img.get_image_data_numpy()
-    image = cv2.resize(image,(240,240))
-    cv2.imshow("test",image)
+    # image = img.get_image_data_numpy()
+    image = cv2.resize(image, (240, 240))
+    cv2.imshow("test", image)
     cv2.waitKey()
-
+    filepath = 'img'
+    cv2.imwrite(filepath, image)
 
 '''
 while cv2.waitKey() != ord('q'):
@@ -39,7 +38,5 @@ while cv2.waitKey() != ord('q'):
 
 '''
 
-
-
-cam.stop_acquisition()
-cam.close_device()
+# cam.stop_acquisition()
+# cam.close_device()
