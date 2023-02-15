@@ -18,12 +18,25 @@ cam.set_param('auto_wb', 1)
 img = xiapi.Image()
 cam.start_acquisition()
 
+for i in range(4):
+    cam.get_image(img)
+    image = img.get_image_data_numpy()
+    image = cv2.resize(image,(240,240))
+    cv2.imshow("test",image)
+    cv2.waitKey()
+
+
+'''
 while cv2.waitKey() != ord('q'):
     cam.get_image(img)
     image = img.get_image_data_numpy()
-    image= cv2.resize(image,(240,240))
+    image = cv2.resize(image,(240,240))
     cv2.imshow("test",image)
     cv2.waitKey()
+    cv2.imwrite(img)
+
+'''
+
 
 
 cam.stop_acquisition()
