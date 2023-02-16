@@ -5,6 +5,7 @@ import cv2
 # cam = xiapi.Camera()
 cam = cv2.VideoCapture(0)
 
+
 # print("Open Camera")
 #
 #
