@@ -5,6 +5,7 @@ import cv2
 # cam = xiapi.Camera()
 cam = cv2.VideoCapture(0)
 
+
 # print("Open Camera")
 #
 #
@@ -16,16 +17,24 @@ cam = cv2.VideoCapture(0)
 # img = xiapi.Image()
 # cam.start_acquisition()
 
-for i in range(4):
-    ret, image = cam.read()
-    # cam.get_image(img)
+def save_webcam_images(count):
+    for i in range(count):
+        ret, image = cam.read()
+        # cam.get_image(img)
 
-    # image = img.get_image_data_numpy()
-    image = cv2.resize(image, (240, 240))
-    cv2.imshow("test", image)
-    cv2.waitKey()
-    filepath = f'resources/img{i}.png'
-    cv2.imwrite(filepath, image)
+        # image = img.get_image_data_numpy()
+        # image = cv2.resize(image, (240, 240))
+        cv2.imshow("test", image)
+
+        filepath = f'resources/img{i}.png'
+        key = 0
+        while key != 32:
+            key = cv2.waitKey()
+        cv2.imwrite(filepath, image)
+        print(f' Image {filepath} is saved')
+
+
+save_webcam_images(4)
 
 '''
 while cv2.waitKey() != ord('q'):
