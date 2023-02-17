@@ -46,6 +46,7 @@ def main():
     cv2.imshow('mosaique', mosaique)
     cv2.imwrite("mosaique.png",mosaique)
     cv2.waitKey()
+    cv2.destroyAllWindows()
 
 
 def create_mosaique(vertical_array: list):
