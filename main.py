@@ -44,7 +44,7 @@ def main():
     array = [tuple(img[1:3]), tuple(img[0:2]), (img[2], img[1])]
     mosaique = create_mosaique(array)
     cv2.imshow('mosaique', mosaique)
-    cv2.imwrite("mosaique.png",mosaique)
+    cv2.imwrite("resources/mosaique.png",mosaique)
     cv2.waitKey()
     cv2.destroyAllWindows()
 
