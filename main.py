@@ -20,7 +20,8 @@ cam = cv2.VideoCapture(0)
 def rotate_image(image):
     height, width, channels = image.shape
     array = np.empty(shape=(width, height, channels), dtype='uint8')
-    for i, item in enumerate(image):
+    for i in range(height):
+        item = image[-i]
         array[:, i] = item
     return array
 
