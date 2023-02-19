@@ -60,6 +60,11 @@ def apply_kernel_filter(mosaique):
     filtered_image = cv2.filter2D(mosaique, -1, kernel)
     # ddepth = -1, means destination image has depth same as input image
     return filtered_image
+def print_img_info(image):
+    print(
+        f"Width is: {len(image[0, :, :])} "
+        f"height is: {len(image[:, 0, :])} "
+        f"and the data type is:{image.dtype}")
 
 
 def main():
@@ -78,7 +83,9 @@ def main():
   red_image=select_red_channel(img[1])
   cv2.imshow('red_image', red_image)
   cv2.imwrite("resources/red_image.png", red_image)
+  print_img_info(red_image)
   cv2.waitKey()
+
   cv2.destroyAllWindows()
 
 
