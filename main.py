@@ -20,8 +20,6 @@ cam = cv2.VideoCapture(0)
 # img = xiapi.Image()
 # cam.start_acquisition()
 
-
-
 def main():
   img = img_fcn.capture_webcam_images(4,cam)
   #array = [tuple(img[1:3]), tuple(img[0:2]), (img[2], img[1])] #num of touples == columns  #num of items in touples== rows
@@ -35,7 +33,7 @@ def main():
   rotated_image=img_fcn.rotate_image(img[2])
   cv2.imshow('rotated_image', rotated_image)
   cv2.imwrite("resources/rotated_image.png", rotated_image)
-  red_image=img_fcn.select_red_channel(img[1])
+  red_image=img_fcn.select_red_channel(img[1],"red")
   cv2.imshow('red_image', red_image)
   cv2.imwrite("resources/red_image.png", red_image)
   img_fcn.print_img_info(red_image)

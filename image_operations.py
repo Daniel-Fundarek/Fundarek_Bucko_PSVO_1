@@ -32,9 +32,17 @@ def capture_webcam_images(count,cam):
     cv2.destroyAllWindows()
     return images
 
-def select_red_channel(image):
+def select_red_channel(image,color:str):
     b, g, r = cv2.split(image)
-    colored_image = cv2.merge([b*0, g*0, r])
+    if color=="blue":
+        colored_image = cv2.merge([b, g * 0, r*0])
+
+    if color == "green":
+        colored_image = cv2.merge([b * 0, g, r*0])
+
+    if color == "red":
+        colored_image = cv2.merge([b*0, g*0, r])
+
     return colored_image
 def apply_kernel_filter(mosaique):
     kernel = np.array([[0, -1, 0],
