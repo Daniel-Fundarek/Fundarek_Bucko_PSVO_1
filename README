@@ -1,0 +1,25 @@
+Zadanie 1 (7 bodov) - odovzdanie v treťom týždni semestra
+Pripojte sa na kameru na vašom PC a vytvorte aplikáciu, ktorá s využitím opencv:
+1. Zosníma 4 ri snímky po stlačení medzerníka a následne snímky uloží to vami definovaného
+priečinku (1 bod)
+2. Vytvorí mozaiku zo 4 roch snímok vo formáte 2x2 a zobrazí ju pomocou príkazu imgshow a
+uloží ju na vami definované miesto – pozor nie použitie funkcie sublot ale vytvorenie
+vlastného obrázka (2 body)
+3. Na prvom obrázku z mozaiky aplikujete funkciu kernel masky na každý pixel (v rozmere 3x3)
+- operáciu realizujte už v existujúcej mozaike ( 1,5 bodu)
+4. Druhú snímku otočte o 90° pomocou využitia for cyklu. ( 1 bod)
+5. Na treťom obrázku vyzobrazte z RGB len červený kanál ( 1 bod)
+6. Do terminálu vypíšete základné informácie o obraze (dátový typ, rozmer, veľkosť) (0,5 bodu)
+Pomôcky:
+• Pre pripojenie kamery využite program v pycharme – kamera už má nainštalovaný driver
+• Potrebné návody na vypracovanie jednotlivých úloh nájdete na stránke
+https://docs.opencv.org/4.7.0/
+o https://docs.opencv.org/4.7.0/db/deb/tutorial_display_image.html pre prácu s
+ukladaním obrázku, zobrazovaním a nahrávaním
+o https://docs.opencv.org/4.7.0/d3/df2/tutorial_py_basic_ops.html pre získanie
+špecifického farebného kanála z obrázku a získanie vlastností obrázku a vytvorenie
+subplotu
+o https://docs.opencv.org/4.7.0/d7/d37/tutorial_mat_mask_operations.html pre
+maskovacie operácie na obraze
+o Vysveltenie formátu MAT v C++
+https://docs.opencv.org/4.x/d6/d6d/tutorial_mat_the_basic_image_container.html
