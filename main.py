@@ -53,6 +53,13 @@ def select_red_channel(image):
     b, g, r = cv2.split(image)
     colored_image = cv2.merge([b*0, g*0, r])
     return colored_image
+def apply_kernel_filter(mosaique):
+    kernel = np.array([[0, -1, 0],
+                       [-1, 5, -1],
+                       [0, -1, 0]], np.float32)  # kernel should be floating point type
+    filtered_image = cv2.filter2D(mosaique, -1, kernel)
+    # ddepth = -1, means destination image has depth same as input image
+    return filtered_image
 
 
 def main():
@@ -61,11 +68,16 @@ def main():
   img_stack=[(img[0],img[2]),(img[1],img[3])]
   mosaique = create_mosaique(img_stack)
   cv2.imshow('mosaique', mosaique)
-  cv2.imwrite("resources/mosaique.png",mosaique)
+  cv2.imwrite("resources/mosaique.png", mosaique)
+  filtered_mosaique=apply_kernel_filter(mosaique)
+  cv2.imshow('kernel_filtered_mosaique', filtered_mosaique)
+  cv2.imwrite("resources/kernel_filtered_mosaique.png",filtered_mosaique)
   rotated_image=rotate_image(img[2])
-  cv2.imshow('img2', rotated_image)
+  cv2.imshow('rotated_image', rotated_image)
+  cv2.imwrite("resources/rotated_image.png", rotated_image)
   red_image=select_red_channel(img[1])
-  cv2.imshow('img1', red_image)
+  cv2.imshow('red_image', red_image)
+  cv2.imwrite("resources/red_image.png", red_image)
   cv2.waitKey()
   cv2.destroyAllWindows()
 
