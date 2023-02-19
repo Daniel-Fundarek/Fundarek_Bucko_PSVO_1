@@ -1,5 +1,6 @@
 # from ximea import xiapi
 import cv2
+import numpy as np
 
 # create instance for first connected camera
 # cam = xiapi.Camera()
@@ -16,6 +17,13 @@ cam = cv2.VideoCapture(0)
 # cam.set_param('auto_wb', 1)
 # img = xiapi.Image()
 # cam.start_acquisition()
+def rotate_image(image):
+    height, width, channels = image.shape
+    array = np.empty(shape=(width, height, channels), dtype='uint8')
+    for i, item in enumerate(image):
+        array[:, i] = item
+    return array
+
 
 def save_webcam_images(count):
     for i in range(count):
@@ -25,6 +33,9 @@ def save_webcam_images(count):
         # image = img.get_image_data_numpy()
         # image = cv2.resize(image, (240, 240))
         cv2.imshow("test", image)
+        img_rotated = rotate_image(image)
+        cv2.imshow("tdest", img_rotated)
+
 
         filepath = f'resources/img{i}.png'
         key = 0
