@@ -34,8 +34,7 @@ def save_webcam_images(count):
         # image = img.get_image_data_numpy()
         # image = cv2.resize(image, (240, 240))
         cv2.imshow("test", image)
-        img_rotated = rotate_image(image)
-        cv2.imshow("tdest", img_rotated)
+
 
 
         filepath = f'resources/img{i}.png'
@@ -47,6 +46,11 @@ def save_webcam_images(count):
 
 
 save_webcam_images(4)
+image = cv2.imread('resources/img1.png')
+img_rotated = rotate_image(image)
+cv2.imshow("tdest", img_rotated)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
 '''
 while cv2.waitKey() != ord('q'):
