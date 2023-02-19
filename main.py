@@ -4,10 +4,6 @@ import numpy as np
 from enum import Enum
 # create instance for first connected camera
 # cam = xiapi.Camera()
-class ColorChannel(Enum):
-    RED = 0
-    GREEN = 1
-    BLUE = 2
 
 cam = cv2.VideoCapture(0)
 
@@ -53,10 +49,10 @@ def capture_webcam_images(count):
     cv2.destroyAllWindows()
     return images
 
-def select_red_channel(image,channel:ColorChannel):
+def select_red_channel(image):
     b, g, r = cv2.split(image)
-
-    image_merge = cv2.merge([r, g, b])
+    colored_image = cv2.merge([b*0, g*0, r])
+    return colored_image
 
 
 def main():
@@ -68,6 +64,8 @@ def main():
   cv2.imwrite("resources/mosaique.png",mosaique)
   rotated_image=rotate_image(img[2])
   cv2.imshow('img2', rotated_image)
+  red_image=select_red_channel(img[1])
+  cv2.imshow('img1', red_image)
   cv2.waitKey()
   cv2.destroyAllWindows()
 
