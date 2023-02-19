@@ -18,7 +18,7 @@ cam = cv2.VideoCapture(0)
 # img = xiapi.Image()
 # cam.start_acquisition()
 
-def save_webcam_images(count):
+def capture_webcam_images(count):
     images = []
     for i in range(count):
         ret, image = cam.read()
@@ -38,21 +38,28 @@ def save_webcam_images(count):
     cv2.destroyAllWindows()
     return images
 
+def select_red_channel(jechu:int):
+    """
 
+    :param jechu:
+    :return:
+    """
+    pass
 def main():
-    img = save_webcam_images(4)
-    array = [tuple(img[1:3]), tuple(img[0:2]), (img[2], img[1])]
-    mosaique = create_mosaique(array)
+    img = capture_webcam_images(4)
+    #array = [tuple(img[1:3]), tuple(img[0:2]), (img[2], img[1])] #num of touples == columns  #num of items in touples== rows
+    img_stack=[(img[0],img[2]),(img[1],img[3])]
+    mosaique = create_mosaique(img_stack)
     cv2.imshow('mosaique', mosaique)
     cv2.imwrite("resources/mosaique.png",mosaique)
     cv2.waitKey()
     cv2.destroyAllWindows()
 
 
-def create_mosaique(vertical_array: list):
+def create_mosaique(image_collection: list):
     """
 
-    :param vertical_array: List[tuple[horizontal pictures], tuple[horizontal pictures],...]
+    :param image_collection: List[tuple[horizontal pictures], tuple[horizontal pictures],...]
     you can add as many tuples to list as you want. Each tuple creates new vertical layer.
     Items in tuple are horizontal pictures in mosaique. you can add as many items to tuple.
     len(List) = num of vertical layers
@@ -60,11 +67,11 @@ def create_mosaique(vertical_array: list):
 
     :return: ndarray - containing concatenated all images into one according to input param
     """
-    h_image_count = len(vertical_array[0])
-    height, width, channels = vertical_array[0][0].shape
+    h_image_count = len(image_collection[0])
+    height, width, channels = image_collection[0][0].shape
     output_array = np.zeros((h_image_count * height, 0, channels), dtype='uint8')
 
-    for horizontal in vertical_array:
+    for horizontal in image_collection:
         output_array = np.concatenate((output_array, np.concatenate(horizontal, axis=0)), axis=1)
     return output_array
 
