@@ -34,6 +34,8 @@ def capture_webcam_images(count,cam):
 
 def select_red_channel(image,color:str):
     b, g, r = cv2.split(image)
+   # if color!="blue"or"green"or"red":
+    #    return image
     if color=="blue":
         colored_image = cv2.merge([b, g * 0, r*0])
 
@@ -44,13 +46,20 @@ def select_red_channel(image,color:str):
         colored_image = cv2.merge([b*0, g*0, r])
 
     return colored_image
-def apply_kernel_filter(mosaique):
+
+def apply_kernel_filter(mosaique,width_start,width_stop,height_start,height_stop):
     kernel = np.array([[0, -1, 0],
                        [-1, 5, -1],
                        [0, -1, 0]], np.float32)  # kernel should be floating point type
-    filtered_image = cv2.filter2D(mosaique, -1, kernel)
+    #filtered_mosaique=mosaique
+    #for i in range(width_stop):
+    #    for j in range(height_stop):
+    #        filtered_mosaique[i,j,:] = cv2.filter2D(mosaique[i,j,:], -1, kernel)
+    #filtered_mosaique=mosaique[width_start:width_stop,height_start:height_stop,:]
+    mosaique[width_start:width_stop,height_start:height_stop,:]=cv2.filter2D(mosaique[width_start:width_stop,height_start:height_stop,:], -1, kernel)
+    #filtered_image = cv2.filter2D(mosaique, -1, kernel)
     # ddepth = -1, means destination image has depth same as input image
-    return filtered_image
+    return mosaique
 def print_img_info(image):
     print(
         f"Width is: {len(image[0, :, :])} "
