@@ -27,7 +27,7 @@ def main():
   mosaique = img_fcn.create_mosaique(img_stack)
   cv2.imshow('mosaique', mosaique)
   cv2.imwrite("resources/mosaique.png", mosaique)
-  filtered_mosaique=img_fcn.apply_kernel_filter(mosaique)
+  filtered_mosaique=img_fcn.apply_kernel_filter(mosaique,100,200,100,200)
   cv2.imshow('kernel_filtered_mosaique', filtered_mosaique)
   cv2.imwrite("resources/kernel_filtered_mosaique.png",filtered_mosaique)
   rotated_image=img_fcn.rotate_image(img[2])
