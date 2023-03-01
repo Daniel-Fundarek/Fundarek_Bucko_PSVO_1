@@ -25,17 +25,14 @@ def capture_webcam_images(count, camera='ntb'):  # cam
         cam.set_param('auto_wb', 1)
         img = xiapi.Image()
         cam.start_acquisition()
+        cam.get_image(img)
+        image = img.get_image_data_numpy()
+        image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
+        image = cv2.resize(image, (240, 240))
+        images.append(image)
+        cv2.imshow("test", image)
 
         for i in range(count):
-            cam.get_image(img)
-
-            image = img.get_image_data_numpy()
-            image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
-
-            image = cv2.resize(image, (240, 240))
-            images.append(image)
-            cv2.imshow("test", image)
-
             filepath = f'resources/img{i}.png'
             key = 0
             while key != 32:
