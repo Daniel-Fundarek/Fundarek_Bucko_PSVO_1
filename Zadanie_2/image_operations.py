@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import glob
 from ximea import xiapi
 
 
@@ -63,56 +64,67 @@ def capture_webcam_images(count, camera='ntb'):  # cam
     cv2.destroyAllWindows()
 
     return images
+def camera_calibration (vert_squares,horiz_squares):
+    # Defining the dimensions of checkerboard
+    CHECKERBOARD = (vert_squares, horiz_squares)
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
+    # Creating vector to store vectors of 3D points for each checkerboard image
+    objpoints = []
+    # Creating vector to store vectors of 2D points for each checkerboard image
+    imgpoints = []
 
-def select_color_channel(image, color: str):
-    b, g, r = cv2.split(image)
-    # if color!="blue"or"green"or"red":
-    #    return image
-    if color == "blue":
-        colored_image = cv2.merge([b, g * 0, r * 0])
+    # Defining the world coordinates for 3D points
+    objp = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
+    objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+    prev_img_shape = None
 
-    if color == "green":
-        colored_image = cv2.merge([b * 0, g, r * 0])
+    # Extracting path of individual image stored in a given directory
+    images = glob.glob('./images/*.jpg')
+    for fname in images:
+        img = cv2.imread(fname)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # Find the chess board corners
+        # If desired number of corners are found in the image then ret = true
+        ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD,
+                                                 cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_FAST_CHECK + cv2.CALIB_CB_NORMALIZE_IMAGE)
 
-    if color == "red":
-        colored_image = cv2.merge([b * 0, g * 0, r])
+        """
+        If desired number of corner are detected,
+        we refine the pixel coordinates and display 
+        them on the images of checker board
+        """
+        if ret == True:
+            objpoints.append(objp)
+            # refining pixel coordinates for given 2d points.
+            corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
 
-    return colored_image
+            imgpoints.append(corners2)
 
+            # Draw and display the corners
+            img = cv2.drawChessboardCorners(img, CHECKERBOARD, corners2, ret)
 
-def apply_kernel_filter(mosaique, width_start, width_stop, height_start, height_stop):
-    kernel = np.array([[0, -1, 0],
-                       [-1, 5, -1],
-                       [0, -1, 0]], np.float32)  # kernel should be floating point type
+        cv2.imshow('img', img)
+        cv2.waitKey(0)
 
-    mosaique[width_start:width_stop, height_start:height_stop, :] = \
-        cv2.filter2D(mosaique[width_start:width_stop, height_start:height_stop, :], -1, kernel)
-    return mosaique
+    cv2.destroyAllWindows()
 
+    h, w = img.shape[:2]
 
-def print_img_info(image):
-    print(
-        f"Width is: {len(image[0, :, :])} "
-        f"height is: {len(image[:, 0, :])} "
-        f"and the data type is:{image.dtype}")
-
-
-def create_mosaique(image_collection: list):
     """
-
-    :param image_collection: List[tuple[horizontal pictures], tuple[horizontal pictures],...]
-    you can add as many tuples to list as you want. Each tuple creates new vertical layer.
-    Items in tuple are horizontal pictures in mosaique. you can add as many items to tuple.
-    len(List) = num of vertical layers
-    len(tuple) = horizontal items number
-
-    :return: ndarray - containing concatenated all images into one according to input param
+    Performing camera calibration by 
+    passing the value of known 3D points (objpoints)
+    and corresponding pixel coordinates of the 
+    detected corners (imgpoints)
     """
-    h_image_count = len(image_collection[0])
-    height, width, channels = image_collection[0][0].shape
-    output_array = np.zeros((h_image_count * height, 0, channels), dtype='uint8')
-
-    for horizontal in image_collection:
-        output_array = np.concatenate((output_array, np.concatenate(horizontal, axis=0)), axis=1)
-    return output_array
+    ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+    if ret:
+        np.savez('camera_calibration.npz', fx=mtx[0,0], fy=mtx[1,1],cx=mtx[0,2],cy=mtx[1,2])
+        print("Camera matrix : \n")
+        print(mtx)
+        print("dist : \n")
+        print(dist)
+        print("rvecs : \n")
+        print(rvecs)
+        print("tvecs : \n")
+        print(tvecs)
