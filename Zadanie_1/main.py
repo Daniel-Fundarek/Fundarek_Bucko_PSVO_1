@@ -6,7 +6,7 @@ from enum import Enum
 
 def main():
     picture_size = 240
-    img = img_fcn.capture_webcam_images(4,"ximea")#ntb or xiemea
+    img = img_fcn.capture_webcam_images("ximea")#ntb or xiemea
     img_stack = [(img[0], img[2]), (img[1], img[3])]
     mosaique = img_fcn.create_mosaique(img_stack)
 

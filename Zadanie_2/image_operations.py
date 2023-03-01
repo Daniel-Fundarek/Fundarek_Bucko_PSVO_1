@@ -13,10 +13,11 @@ def rotate_image(image):
     return array
 
 
-def capture_webcam_images(count, camera='ntb'):  # cam
-    cam = None
+def capture_webcam_images(camera='ntb'):  # cam
     images = []
-
+    i = 0
+    filepath = f'resources/img'
+    key = 0
     if camera == "ximea":
         cam = xiapi.Camera()
         print("Open Camera")
@@ -26,20 +27,23 @@ def capture_webcam_images(count, camera='ntb'):  # cam
         cam.set_param('auto_wb', 1)
         img = xiapi.Image()
         cam.start_acquisition()
-        cam.get_image(img)
-        image = img.get_image_data_numpy()
-        image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
-        image = cv2.resize(image, (240, 240))
-        images.append(image)
-        cv2.imshow("test", image)
 
-        for i in range(count):
-            filepath = f'resources/img{i}.png'
-            key = 0
-            while key != 32:
-                key = cv2.waitKey()
-            cv2.imwrite(filepath, image)
-            print(f' Image {filepath} is saved')
+        while key != ord('q'):
+
+            cam.get_image(img)
+            image = img.get_image_data_numpy()
+            image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
+            image = cv2.resize(image, (240, 240))
+            cv2.imshow("preview", image)
+            if key == ord(' '):
+                images.append(image)
+                key = 0
+                filepath1 = filepath + str(i) + '.png'
+                cv2.imwrite(filepath1, image)
+                print(f' Image {filepath1} is saved')
+                i += 1
+
+            key = cv2.waitKey(1)
 
         cam.stop_acquisition()
         cam.close_device()
@@ -47,22 +51,23 @@ def capture_webcam_images(count, camera='ntb'):  # cam
     if camera == 'ntb':
         cam = cv2.VideoCapture(0)
 
-        for i in range(count):
+        while key != ord('q'):
+
             ret, image = cam.read()
-
             image = cv2.resize(image, (240, 240))
-            images.append(image)
-            cv2.imshow("test", image)
+            cv2.imshow("preview", image)
+            if key == ord(' '):
+                images.append(image)
+                key = 0
+                filepath1 = filepath + str(i) + '.png'
 
-            filepath = f'resources/img{i}.png'
-            key = 0
-            while key != 32:
-                key = cv2.waitKey()
-            cv2.imwrite(filepath, image)
-            print(f' Image {filepath} is saved')
+                cv2.imwrite(filepath1, image)
+                print(f' Image {filepath1} is saved')
+                i +=1
+
+            key = cv2.waitKey(1)
 
     cv2.destroyAllWindows()
-
     return images
 def camera_calibration (vert_squares,horiz_squares):
     # Defining the dimensions of checkerboard
