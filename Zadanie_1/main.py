@@ -19,7 +19,7 @@ def main():
     mosaique[picture_size:picture_size * 2, 0:picture_size, :] = img_fcn.rotate_image(
         mosaique[picture_size:picture_size * 2, 0:picture_size, :])
 
-    mosaique[0:picture_size, picture_size:picture_size * 2, :] = img_fcn.select_red_channel(
+    mosaique[0:picture_size, picture_size:picture_size * 2, :] = img_fcn.select_color_channel(
         mosaique[0:picture_size, picture_size:picture_size * 2, :], "red")
 
     cv2.imshow('mosaique_post_processing', mosaique)

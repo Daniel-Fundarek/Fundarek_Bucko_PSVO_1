@@ -68,7 +68,7 @@ def capture_webcam_images(count, camera='ntb'):  # cam
     return images
 
 
-def select_red_channel(image, color: str):
+def select_color_channel(image, color: str):
     b, g, r = cv2.split(image)
     # if color!="blue"or"green"or"red":
     #    return image
