@@ -13,7 +13,7 @@ def rotate_image(image):
     return array
 
 
-def capture_webcam_images(img_size,camera='ntb'):  # cam
+def capture_webcam_images(img_size, camera='ntb'):  # cam
     images = []
     i = 0
     filepath = f'resources/img'
@@ -63,7 +63,7 @@ def capture_webcam_images(img_size,camera='ntb'):  # cam
 
                 cv2.imwrite(filepath1, image)
                 print(f' Image {filepath1} is saved')
-                i +=1
+                i += 1
 
             key = cv2.waitKey(1)
 
@@ -71,7 +71,20 @@ def capture_webcam_images(img_size,camera='ntb'):  # cam
     return images
 
 
-def camera_calibration (vert_squares,horiz_squares):
+def detect_circle(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=0)
+    circles = np.uint16(np.around(circles))
+    for i in circles[0, :]:
+        # draw the outer circle
+        cv2.circle(img, (i[0], i[1]), i[2], (0, 255, 0), 2)
+        # draw the center of the circle
+        cv2.circle(img, (i[0], i[1]), 2, (0, 0, 255), 3)
+
+        cv2.imshow("circle", img)
+
+
+def camera_calibration(vert_squares, horiz_squares):
     # Defining the dimensions of checkerboard
     CHECKERBOARD = (vert_squares, horiz_squares)
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -126,7 +139,7 @@ def camera_calibration (vert_squares,horiz_squares):
     """
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
     if ret:
-        np.savez('camera_calibration.npz', fx=mtx[0,0], fy=mtx[1,1],cx=mtx[0,2],cy=mtx[1,2])
+        np.savez('camera_calibration.npz', fx=mtx[0, 0], fy=mtx[1, 1], cx=mtx[0, 2], cy=mtx[1, 2])
         print("Camera matrix : \n")
         print(mtx)
         print("dist : \n")
