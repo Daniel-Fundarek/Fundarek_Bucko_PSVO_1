@@ -13,7 +13,7 @@ def rotate_image(image):
     return array
 
 
-def capture_webcam_images(camera='ntb'):  # cam
+def capture_webcam_images(camera='ntb',(img_size)):  # cam
     images = []
     i = 0
     filepath = f'resources/img'
@@ -33,7 +33,7 @@ def capture_webcam_images(camera='ntb'):  # cam
             cam.get_image(img)
             image = img.get_image_data_numpy()
             image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
-            image = cv2.resize(image, (240, 240))
+            image = cv2.resize(image, img_size)
             cv2.imshow("preview", image)
             if key == ord(' '):
                 images.append(image)
@@ -69,6 +69,8 @@ def capture_webcam_images(camera='ntb'):  # cam
 
     cv2.destroyAllWindows()
     return images
+
+
 def camera_calibration (vert_squares,horiz_squares):
     # Defining the dimensions of checkerboard
     CHECKERBOARD = (vert_squares, horiz_squares)
