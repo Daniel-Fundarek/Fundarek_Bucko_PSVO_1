@@ -104,8 +104,8 @@ def camera_calibration(vert_squares, horiz_squares):
     imgpoints = []
 
     # Defining the world coordinates for 3D points
-    objp = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
-    objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+    obj_array = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
+    obj_array[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
     prev_img_shape = None
 
     # Extracting path of individual image stored in a given directory
@@ -115,7 +115,9 @@ def camera_calibration(vert_squares, horiz_squares):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         # Find the chess board corners
         # If desired number of corners are found in the image then ret = true
-        ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD,None)
+        #ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD,
+        #                                         cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_FAST_CHECK + cv2.CALIB_CB_NORMALIZE_IMAGE)
+        ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD, None)
 
         """
         If desired number of corner are detected,
@@ -124,7 +126,7 @@ def camera_calibration(vert_squares, horiz_squares):
         """
         if ret == True:
             print("found")
-            objpoints.append(objp)
+            objpoints.append(obj_array)
             # refining pixel coordinates for given 2d points.
             corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
 
