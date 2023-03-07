@@ -13,7 +13,7 @@ def rotate_image(image):
     return array
 
 
-def capture_webcam_images(camera='ntb',img_size):  # cam
+def capture_webcam_images(img_size,camera='ntb'):  # cam
     images = []
     i = 0
     filepath = f'resources/img'
