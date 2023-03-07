@@ -71,9 +71,13 @@ def capture_webcam_images(img_size, camera='ntb'):  # cam
     return images
 
 
-def detect_circle(img):
+def detect_circle():
+    img = cv2.imread("resources/circle.jpg")
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=0)
+    #_, gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    #
+    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1, 30, param1=10, param2=130, minRadius=0, maxRadius=0)
+    # cv2.imshow("circle", ~gray)
     circles = np.uint16(np.around(circles))
     for i in circles[0, :]:
         # draw the outer circle
