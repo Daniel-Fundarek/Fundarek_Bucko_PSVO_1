@@ -11,7 +11,12 @@ def rotate_image(image):
         pixel_row = image[-i]
         array[:, i] = pixel_row  # rotate pixel_row to pixel column
     return array
-
+def openNPZ():
+    data = np.load('camera_calibration.npz')
+    lst = data.files
+    for item in lst:
+        print(item)
+        print(data[item])
 
 def capture_webcam_images(img_size, camera='ntb'):  # cam
     images = []
@@ -104,14 +109,13 @@ def camera_calibration(vert_squares, horiz_squares):
     prev_img_shape = None
 
     # Extracting path of individual image stored in a given directory
-    images = glob.glob('./images/*.jpg')
+    images = glob.glob('./resources/*.png')
     for fname in images:
         img = cv2.imread(fname)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         # Find the chess board corners
         # If desired number of corners are found in the image then ret = true
-        ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD,
-                                                 cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_FAST_CHECK + cv2.CALIB_CB_NORMALIZE_IMAGE)
+        ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD,None)
 
         """
         If desired number of corner are detected,
@@ -119,6 +123,7 @@ def camera_calibration(vert_squares, horiz_squares):
         them on the images of checker board
         """
         if ret == True:
+            print("found")
             objpoints.append(objp)
             # refining pixel coordinates for given 2d points.
             corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
