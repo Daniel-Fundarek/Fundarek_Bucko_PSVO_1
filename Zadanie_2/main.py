@@ -7,6 +7,7 @@ def main2():
     # picture_size = 240
     # img_fcn.camera_calibration(6, 8)
     # img = img_fcn.capture_webcam_images(picture_size,"ximea")#ntb or xiemea
+    
     img_fcn.detect_circle()
     cv2.waitKey()
     cv2.destroyAllWindows()
