@@ -39,6 +39,8 @@ def capture_webcam_images(img_size, camera='ntb'):  # cam
             image = img.get_image_data_numpy()
             # image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
             image = cv2.cvtColor(image, cv2.COLOR_BGRA2BGR)
+            ########### aplikacia  kalibracnej matice na fotku
+
 
             image = detect_circle(image)
             image = cv2.resize(image, img_size)
@@ -63,6 +65,7 @@ def capture_webcam_images(img_size, camera='ntb'):  # cam
         while key != ord('q'):
 
             ret, image = cam.read()
+            ########### aplikacia  kalibracnej matice na fotku
             image = cv2.resize(image, img_size)
             image = detect_circle(image)
             cv2.imshow("preview", image)
@@ -83,9 +86,14 @@ def capture_webcam_images(img_size, camera='ntb'):  # cam
 
 def detect_circle(img = None):
     # img = cv2.imread("circles/circle0.png")
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gauss = cv2.GaussianBlur(img, (7, 7), 1.5)
+    gray = cv2.cvtColor(gauss, cv2.COLOR_BGR2GRAY)
+
+
     print("image loaded")
-    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 3, 1800, param1=220, param2=95, minRadius=100, maxRadius=600)
+
+    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT_ALT, 2, 1000, param1=300, param2=0.5, minRadius=50, maxRadius=0)
+    # circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 3, 1800, param1=220, param2=95, minRadius=100, maxRadius=600)
     print("sds")
     # cv2.imshow("circle", ~gray)
     if circles is not None:
@@ -95,7 +103,7 @@ def detect_circle(img = None):
             cv2.circle(img, (i[0], i[1]), i[2], (0, 255, 0), 2)
             # draw the center of the circle
             cv2.circle(img, (i[0], i[1]), 2, (0, 0, 255), 3)
-    cv2.imshow("circle",img)
+    # cv2.imshow("circle",img)
     return img
 
 
