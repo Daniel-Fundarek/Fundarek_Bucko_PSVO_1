@@ -21,7 +21,7 @@ def openNPZ():
 def capture_webcam_images(img_size, camera='ntb'):  # cam
     images = []
     i = 0
-    filepath = f'resources/img'
+    filepath = f'circles/circle'
     key = 0
     if camera == "ximea":
         cam = xiapi.Camera()
@@ -37,8 +37,12 @@ def capture_webcam_images(img_size, camera='ntb'):  # cam
 
             cam.get_image(img)
             image = img.get_image_data_numpy()
-            image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
+            # image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
+            image = cv2.cvtColor(image, cv2.COLOR_BGRA2BGR)
+
+            image = detect_circle(image)
             image = cv2.resize(image, img_size)
+
             cv2.imshow("preview", image)
             if key == ord(' '):
                 images.append(image)
@@ -48,7 +52,7 @@ def capture_webcam_images(img_size, camera='ntb'):  # cam
                 print(f' Image {filepath1} is saved')
                 i += 1
 
-            key = cv2.waitKey(1)
+            key = cv2.waitKey(100)
 
         cam.stop_acquisition()
         cam.close_device()
@@ -59,7 +63,8 @@ def capture_webcam_images(img_size, camera='ntb'):  # cam
         while key != ord('q'):
 
             ret, image = cam.read()
-            image = cv2.resize(image, (240, 240))
+            image = cv2.resize(image, img_size)
+            image = detect_circle(image)
             cv2.imshow("preview", image)
             if key == ord(' '):
                 images.append(image)
@@ -70,27 +75,28 @@ def capture_webcam_images(img_size, camera='ntb'):  # cam
                 print(f' Image {filepath1} is saved')
                 i += 1
 
-            key = cv2.waitKey(1)
+            key = cv2.waitKey(100)
 
     cv2.destroyAllWindows()
     return images
 
 
-def detect_circle():
-    img = cv2.imread("resources/circle.jpg")
+def detect_circle(img = None):
+    # img = cv2.imread("circles/circle0.png")
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #_, gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    #
-    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1, 30, param1=10, param2=130, minRadius=0, maxRadius=0)
+    print("image loaded")
+    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 3, 1800, param1=220, param2=95, minRadius=100, maxRadius=600)
+    print("sds")
     # cv2.imshow("circle", ~gray)
-    circles = np.uint16(np.around(circles))
-    for i in circles[0, :]:
-        # draw the outer circle
-        cv2.circle(img, (i[0], i[1]), i[2], (0, 255, 0), 2)
-        # draw the center of the circle
-        cv2.circle(img, (i[0], i[1]), 2, (0, 0, 255), 3)
-
-        cv2.imshow("circle", img)
+    if circles is not None:
+        circles = np.uint16(np.around(circles))
+        for i in circles[0, :]:
+            # draw the outer circle
+            cv2.circle(img, (i[0], i[1]), i[2], (0, 255, 0), 2)
+            # draw the center of the circle
+            cv2.circle(img, (i[0], i[1]), 2, (0, 0, 255), 3)
+    cv2.imshow("circle",img)
+    return img
 
 
 def camera_calibration(vert_squares, horiz_squares):
