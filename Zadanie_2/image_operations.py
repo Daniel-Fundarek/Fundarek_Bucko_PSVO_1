@@ -3,7 +3,14 @@ import numpy as np
 import glob
 from ximea import xiapi
 
-
+mtx=None
+dist=None
+newcameramtx=None
+roi=None
+h=None
+w=None
+rvecs=None
+tvecs=None
 def rotate_image(image):
     height, width, channels = image.shape
     array = np.empty(shape=(width, height, channels), dtype='uint8')
@@ -19,9 +26,10 @@ def openNPZ():
         print(data[item])
 
 def capture_webcam_images(img_size, camera='ntb'):  # cam
+
     images = []
     i = 0
-    filepath = f'circles/circle'
+    filepath = f'resources/chessboard'
     key = 0
     if camera == "ximea":
         cam = xiapi.Camera()
@@ -40,8 +48,9 @@ def capture_webcam_images(img_size, camera='ntb'):  # cam
             # image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
             image = cv2.cvtColor(image, cv2.COLOR_BGRA2BGR)
             ########### aplikacia  kalibracnej matice na fotku
-
-
+            undistorted_image = cv2.undistort(image, mtx, dist, None, newcameramtx)
+            x, y, w, h = roi
+            image = undistorted_image[y:y + h, x:x + w]
             image = detect_circle(image)
             image = cv2.resize(image, img_size)
 
@@ -66,6 +75,9 @@ def capture_webcam_images(img_size, camera='ntb'):  # cam
 
             ret, image = cam.read()
             ########### aplikacia  kalibracnej matice na fotku
+            undistorted_image = cv2.undistort(image, mtx, dist, None, newcameramtx)
+            x, y, w, h = roi
+            image = undistorted_image[y:y + h, x:x + w]
             image = cv2.resize(image, img_size)
             image = detect_circle(image)
             cv2.imshow("preview", image)
@@ -108,6 +120,14 @@ def detect_circle(img = None):
 
 
 def camera_calibration(vert_squares, horiz_squares):
+    global mtx
+    global dist
+    global newcameramtx
+    global roi
+    global h
+    global w
+    global rvecs
+    global tvecs
     # Defining the dimensions of checkerboard
     CHECKERBOARD = (vert_squares, horiz_squares)
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -173,3 +193,15 @@ def camera_calibration(vert_squares, horiz_squares):
         print(rvecs)
         print("tvecs : \n")
         print(tvecs)
+    h, w = img.shape[:2]
+    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+def undistor_images():
+    images = glob.glob('./resources/*.png')
+    for fname in images:
+        distorted_image = cv2.imread(fname)
+        cv2.imshow('distorted_image', distorted_image)
+        undistorted_image = cv2.undistort(distorted_image, mtx, dist, None, newcameramtx)
+        x, y, w, h = roi
+        undistorted_image = undistorted_image[y:y + h, x:x + w]
+        cv2.imshow('undst', undistorted_image)
+        cv2.waitKey(0)
