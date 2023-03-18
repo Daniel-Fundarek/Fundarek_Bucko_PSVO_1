@@ -3,8 +3,8 @@ import numpy as np
 import glob
 from ximea import xiapi
 import numpy as np
-from skimage import io, color
-import skimage as ski
+# from skimage import io, color
+# import skimage as ski
 def hough_transform_circle_second(img, radius_range, min_votes):
     rows, cols = img.shape
     rmin, rmax = radius_range
