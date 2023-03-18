@@ -24,7 +24,7 @@ def main2():
     gray_image=cv2.Canny(gray,100,200)
 
     # Apply Hough Transform to detect the circles
-    circles = img_fcn.hough_transform_circle_second(gray_image, (70, 100), 100)
+    circles = img_fcn.hough_transform_circle_second(gray_image, (56, 59), 150)
     # Draw the detected circles on the original image
     for circle in circles:
         # rr, cc = circle_perimeter(circle[0], circle[1], circle[2])
@@ -48,7 +48,7 @@ def main2():
         radius = circle[2]
 
         # Red color in BGR
-        color = (0, 0, 255)
+        color = (255, 255, 0)
 
         # Line thickness of -1 px
         thickness = 1
