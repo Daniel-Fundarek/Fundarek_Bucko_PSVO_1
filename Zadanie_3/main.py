@@ -8,21 +8,37 @@ import numpy as np
 
 import math
 
-def get_circle_outline_indexes(x, y, r,array):
+
+def get_circle_outline_indexes(x_indexes, y_indexes, r, accumulator):
     indexes = []
     step = 1
-    for i in range(int(x-r), int(x+r+1),step):
-        for j in range(y-r, y+r+1,step):
-            distance = math.sqrt((i-x)**2 + (j-y)**2)
-            if math.isclose(distance, r, rel_tol=0.02):
-                if 0<= i < array.shape[1] and 0<= j < array.shape[0]:
-                    # indexes.append((int(i), int(j)))
-                    array[j,i] += 1
+    thetas = np.linspace(0, 2 * np.pi, 400)
+    cos_thetas = np.cos(thetas)
+    sin_thetas = np.sin(thetas)
+
+    for x, y in zip(x_indexes,y_indexes):
+        xs = x - r * sin_thetas
+        ys = y + r * cos_thetas
+        # Find the valid indices where xs_int and ys_int are within the image dimensions
+        valid_indices = np.where((0 <= xs) & (xs < accumulator.shape[1]-1) & (0 <= ys) & (ys < accumulator.shape[0]-1))
+
+        # Increment the accumulator array at the valid center coordinates
+        xs_int, ys_int = np.round(xs[valid_indices]).astype(int), np.round(ys[valid_indices]).astype(int)
+        accumulator[ys_int, xs_int] += 1
+
+
+    # for i in range(int(x-r), int(x+r+1),step):
+    #     for j in range(y-r, y+r+1,step):
+    #         distance = math.sqrt((i-x)**2 + (j-y)**2)
+    #         if math.isclose(distance, r, rel_tol=0.02):
+    #             if 0<= i < array.shape[1] and 0<= j < array.shape[0]:
+    #                 # indexes.append((int(i), int(j)))
+    #                 array[j,i] += 1
 
     # return indexes
+
+
 def main2():
-
-
     # Load the image and convert it to grayscale
     img = cv2.imread('circle.jpg')
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -34,26 +50,37 @@ def main2():
     dp = 1
     minDist = 50
     param1 = 50
-    param2 = 30
+    threshold = 80
     minRadius = 20
     maxRadius = 400
-    r = 220
+    r = 204
     accumulator = np.zeros(gray.shape, dtype=np.uint64)
     edges = cv2.Canny(gray, 100, 200)
     # Apply the Hough Circle transform
     circles = []
     # Create circle template with radius r
-    test_acum = np.zeros(gray.shape, dtype=np.uint8)
-    x_indexes,y_indexes = np.nonzero(edges)
-    # for x in x_indexes:
-    #     pass
-    for x,y in zip(x_indexes, y_indexes):
-        get_circle_outline_indexes(x,y,r,test_acum)
+    accumulator = np.zeros(gray.shape, dtype=np.uint8)
+    y_indexes, x_indexes = np.nonzero(edges)
 
-    arr_normalized = (test_acum - test_acum.min()) / (test_acum.max() - test_acum.min())  # normalize array
-    arr_uint8 = (arr_normalized * 255).astype(np.uint8)  # scale down array
-    cv2.imshow('convolved', arr_uint8)
+    get_circle_outline_indexes(x_indexes, y_indexes, r, accumulator)
+    arr_normalized = (accumulator - accumulator.min()) / (accumulator.max() - accumulator.min())  # normalize array
+    uint8_accumulator_normalized = (arr_normalized * 255).astype(np.uint8)  # scale down array
+    cv2.imshow('convolved', uint8_accumulator_normalized)
+    print(np.sort(accumulator.flatten())[::-1][0:50])
+
+    #hladanei najvacsich hodnot a nasledne zobrazovanie stredov
+    k = 20
+    flatten_idx = np.argpartition(accumulator.flatten(), -k)[-k:]
+    cy,cx = idx= np.unravel_index(flatten_idx, accumulator.shape)
+
+    for x,y in zip(cx,cy):
+        cv2.circle(accumulator,(x,y),1,(255,0,255),2)
+        cv2.circle(img, (x, y), 1, (255, 0, 255), 2)
+    cv2.imshow('center', accumulator)
+    cv2.imshow('center1', img)
+    # print(idx)
     cv2.waitKey(0)
+
 
     #
 
@@ -70,39 +97,36 @@ def main2():
     #             pass
     #             # tu iterujeme cez kruznicu
 
-
-
-
     # Apply Hough Transform to detect the circles
     # circles = img_fcn.hough_transform_circle_second(gray_image, (20, 50), 100)
 
-   #  # Draw the detected circles on the original image
-   #  for circle in circles:
-   #      rr, cc = circle_perimeter(circle[0], circle[1], circle[2])
-   #
-   #      # Create masks for the coordinates that are in bounds
-   #      y_mask = np.logical_and(rr >= 0, rr < image.shape[0])
-   #      x_mask = np.logical_and(cc >= 0, cc < image.shape[1])
-   #      mask = np.logical_and(x_mask, y_mask)
-   #
-   #      # Apply the masks to the coordinate arrays
-   #      rr = rr[mask]
-   #      cc = cc[mask]
-   #
-   #      # Set the circle pixels to red
-   #      image[rr, cc] = [0, 255, 0]
-   #
-   #  # Display the image with the detected circles
-   # # plt.imshow(image)
-   # # plt.show()
-   #  image_orig = io.imread('resources/blue_circle.png')
-   #  cv2.imshow("preview", image_orig)
-   #  cv2.imshow("detected", image)
-   #  #img_fcn.openNPZ()
-   #  # img_fcn.detect_circle()
-   #  cv2.waitKey()
-   #  cv2.destroyAllWindows()
 
+#  # Draw the detected circles on the original image
+#  for circle in circles:
+#      rr, cc = circle_perimeter(circle[0], circle[1], circle[2])
+#
+#      # Create masks for the coordinates that are in bounds
+#      y_mask = np.logical_and(rr >= 0, rr < image.shape[0])
+#      x_mask = np.logical_and(cc >= 0, cc < image.shape[1])
+#      mask = np.logical_and(x_mask, y_mask)
+#
+#      # Apply the masks to the coordinate arrays
+#      rr = rr[mask]
+#      cc = cc[mask]
+#
+#      # Set the circle pixels to red
+#      image[rr, cc] = [0, 255, 0]
+#
+#  # Display the image with the detected circles
+# # plt.imshow(image)
+# # plt.show()
+#  image_orig = io.imread('resources/blue_circle.png')
+#  cv2.imshow("preview", image_orig)
+#  cv2.imshow("detected", image)
+#  #img_fcn.openNPZ()
+#  # img_fcn.detect_circle()
+#  cv2.waitKey()
+#  cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
