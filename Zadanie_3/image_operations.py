@@ -44,7 +44,8 @@ def hough_transform_circle_second(img, radius_range, min_votes):
             # Increment the accumulator array at the valid center coordinates
             xs_int, ys_int = np.round(xs[valid_indices]).astype(int), np.round(ys[valid_indices]).astype(int)
             accumulator[ys_int, xs_int, r_idx] += 1
-
+        #cv2.imshow("accumulator",accumulator[:,:,r_idx])
+        #cv2.waitKey()
     # Find circles with the highest number of votes
     max_votes = np.max(accumulator, axis=2)
     max_coords = np.argwhere(max_votes > min_votes)
