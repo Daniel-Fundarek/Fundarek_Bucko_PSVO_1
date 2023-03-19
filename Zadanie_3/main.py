@@ -27,16 +27,6 @@ def fill_accumulator(x_indexes, y_indexes, r, accumulator):
         accumulator[ys_int, xs_int] += 1
 
 
-    # for i in range(int(x-r), int(x+r+1),step):
-    #     for j in range(y-r, y+r+1,step):
-    #         distance = math.sqrt((i-x)**2 + (j-y)**2)
-    #         if math.isclose(distance, r, rel_tol=0.02):
-    #             if 0<= i < array.shape[1] and 0<= j < array.shape[0]:
-    #                 # indexes.append((int(i), int(j)))
-    #                 array[j,i] += 1
-
-    # return indexes
-
 
 def main2():
     # Load the image and convert it to grayscale
@@ -63,22 +53,20 @@ def main2():
 
     y_indexes, x_indexes = np.nonzero(edges)
     for r in range(minRadius,maxRadius+1):
-        accumulator = np.zeros(gray.shape, dtype=np.uint16)
+        accumulator = np.zeros(gray.shape, dtype=np.uint8)
         print(r)
         fill_accumulator(x_indexes, y_indexes, r, accumulator)
-        arr_normalized = (accumulator - accumulator.min()) / (accumulator.max() - accumulator.min())  # normalize array
-        uint8_accumulator_normalized = (arr_normalized * 255).astype(np.uint8)  # scale down array
+        # uint8_accumulator_normalized = accumulator
+        # arr_normalized = (accumulator - accumulator.min()) / (accumulator.max() - accumulator.min())  # normalize array
+        # uint8_accumulator_normalized = (arr_normalized * 255).astype(np.uint8)  # scale down array
         # cv2.imshow('convolved', uint8_accumulator_normalized)
         # cv2.waitKey(0)
-
-        print(np.sort(accumulator.flatten())[::-1][0:50])
+        # print(np.sort(accumulator.flatten())[::-1][0:50])
 
         # #hladanei najvacsich hodnot a nasledne zobrazovanie stredov
-        # k = 20
-        # flatten_idx = np.argpartition(accumulator.flatten(), -k)[-k:]
-        # cy,cx = idx= np.unravel_index(flatten_idx, accumulator.shape)
-        cy,cx = indices = np.where(accumulator >= threshold)
-
+        cy,cx = np.where(accumulator >= threshold)
+        value = accumulator[cy,cx]
+        # (cx, cy, r, value)
         # sorted_indices = np.argsort(accumulator, axis=None)
         # cy,cx = np.unravel_index(sorted_indices,accumulator.shape)
 
@@ -93,51 +81,8 @@ def main2():
     cv2.waitKey(0)
 
 
-    #
-
-    # edges_ind = np.argwhere(edges>0)
-    # for y,x in edges:
-    #     a = x - r * np.sin(np.arcsin((y - dp * r) / r))
-    #     b = y + r * np.cos(np.arcsin((y - dp * r) / r))
-    #     if 0 < a < gray.shape[1] and 0 < b < gray.shape[0]:
-    #         accumulator[int(b), int(a)] += 1
-    #
-    # for y in range(edges.shape[0]):
-    #     for x in range(edges.shape[1]):
-    #         if edges[y][x] > 0:
-    #             pass
-    #             # tu iterujeme cez kruznicu
-
-    # Apply Hough Transform to detect the circles
-    # circles = img_fcn.hough_transform_circle_second(gray_image, (20, 50), 100)
 
 
-#  # Draw the detected circles on the original image
-#  for circle in circles:
-#      rr, cc = circle_perimeter(circle[0], circle[1], circle[2])
-#
-#      # Create masks for the coordinates that are in bounds
-#      y_mask = np.logical_and(rr >= 0, rr < image.shape[0])
-#      x_mask = np.logical_and(cc >= 0, cc < image.shape[1])
-#      mask = np.logical_and(x_mask, y_mask)
-#
-#      # Apply the masks to the coordinate arrays
-#      rr = rr[mask]
-#      cc = cc[mask]
-#
-#      # Set the circle pixels to red
-#      image[rr, cc] = [0, 255, 0]
-#
-#  # Display the image with the detected circles
-# # plt.imshow(image)
-# # plt.show()
-#  image_orig = io.imread('resources/blue_circle.png')
-#  cv2.imshow("preview", image_orig)
-#  cv2.imshow("detected", image)
-#  #img_fcn.openNPZ()
-#  # img_fcn.detect_circle()
-#  cv2.waitKey()
-#  cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
