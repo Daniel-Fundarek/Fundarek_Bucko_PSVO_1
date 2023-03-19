@@ -9,10 +9,10 @@ import numpy as np
 import math
 
 
-def get_circle_outline_indexes(x_indexes, y_indexes, r, accumulator):
+def fill_accumulator(x_indexes, y_indexes, r, accumulator):
     indexes = []
     step = 1
-    thetas = np.linspace(0, 2 * np.pi, 400)
+    thetas = np.linspace(0, 2 * np.pi, 100)
     cos_thetas = np.cos(thetas)
     sin_thetas = np.sin(thetas)
 
@@ -40,7 +40,8 @@ def get_circle_outline_indexes(x_indexes, y_indexes, r, accumulator):
 
 def main2():
     # Load the image and convert it to grayscale
-    img = cv2.imread('circle.jpg')
+    img = cv2.imread('circle1.jpg')
+    cv2.imshow('original',img)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Apply GaussianBlur to reduce noise
@@ -50,33 +51,43 @@ def main2():
     dp = 1
     minDist = 50
     param1 = 50
-    threshold = 80
+    threshold = 75
     minRadius = 20
-    maxRadius = 400
-    r = 204
+    maxRadius = 150
+    # r = 215
     accumulator = np.zeros(gray.shape, dtype=np.uint64)
     edges = cv2.Canny(gray, 100, 200)
     # Apply the Hough Circle transform
     circles = []
     # Create circle template with radius r
-    accumulator = np.zeros(gray.shape, dtype=np.uint8)
+
     y_indexes, x_indexes = np.nonzero(edges)
+    for r in range(minRadius,maxRadius+1):
+        accumulator = np.zeros(gray.shape, dtype=np.uint16)
+        print(r)
+        fill_accumulator(x_indexes, y_indexes, r, accumulator)
+        arr_normalized = (accumulator - accumulator.min()) / (accumulator.max() - accumulator.min())  # normalize array
+        uint8_accumulator_normalized = (arr_normalized * 255).astype(np.uint8)  # scale down array
+        # cv2.imshow('convolved', uint8_accumulator_normalized)
+        # cv2.waitKey(0)
 
-    get_circle_outline_indexes(x_indexes, y_indexes, r, accumulator)
-    arr_normalized = (accumulator - accumulator.min()) / (accumulator.max() - accumulator.min())  # normalize array
-    uint8_accumulator_normalized = (arr_normalized * 255).astype(np.uint8)  # scale down array
-    cv2.imshow('convolved', uint8_accumulator_normalized)
-    print(np.sort(accumulator.flatten())[::-1][0:50])
+        print(np.sort(accumulator.flatten())[::-1][0:50])
 
-    #hladanei najvacsich hodnot a nasledne zobrazovanie stredov
-    k = 20
-    flatten_idx = np.argpartition(accumulator.flatten(), -k)[-k:]
-    cy,cx = idx= np.unravel_index(flatten_idx, accumulator.shape)
+        # #hladanei najvacsich hodnot a nasledne zobrazovanie stredov
+        # k = 20
+        # flatten_idx = np.argpartition(accumulator.flatten(), -k)[-k:]
+        # cy,cx = idx= np.unravel_index(flatten_idx, accumulator.shape)
+        cy,cx = indices = np.where(accumulator >= threshold)
 
-    for x,y in zip(cx,cy):
-        cv2.circle(accumulator,(x,y),1,(255,0,255),2)
-        cv2.circle(img, (x, y), 1, (255, 0, 255), 2)
-    cv2.imshow('center', accumulator)
+        # sorted_indices = np.argsort(accumulator, axis=None)
+        # cy,cx = np.unravel_index(sorted_indices,accumulator.shape)
+
+
+        for x,y in zip(cx,cy):
+            # cv2.circle(accumulator,(x,y),1,(255,0,255),2)
+            cv2.circle(img, (x, y), 1, (255, 0, 255), 2)
+            cv2.circle(img, (x, y), r, (255, 0, 0), 2)
+    # cv2.imshow('center', accumulator)
     cv2.imshow('center1', img)
     # print(idx)
     cv2.waitKey(0)
