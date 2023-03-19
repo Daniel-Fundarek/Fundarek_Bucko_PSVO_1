@@ -39,11 +39,11 @@ def main2():
 
     # Set the Hough Circle parameters
     dp = 1
-    minDist = 200
+    minDist = 150
     param1 = 50
-    threshold = 75
-    minRadius = 20
-    maxRadius = 150
+    threshold = 75#20#75
+    minRadius = 20#180#20
+    maxRadius = 150#400#150
     # r = 215
     accumulator = np.zeros(gray.shape, dtype=np.uint64)
     edges = cv2.Canny(gray, 100, 200)
@@ -81,7 +81,6 @@ def main2():
             cx0, cy0, r0, val0 = new_circles[j]
             dist = np.sqrt((cx1 - cx0) ** 2 + (cy1 - cy0) ** 2)
             if dist < minDist:  # set your desired threshold here
-                if val1 < val0:
                     add_circle = False
         if add_circle:
             new_circles.append(sorted_circles[i])
