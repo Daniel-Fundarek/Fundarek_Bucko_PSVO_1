@@ -39,7 +39,7 @@ def main2():
 
     # Set the Hough Circle parameters
     dp = 1
-    minDist = 50
+    minDist = 200
     param1 = 50
     threshold = 75
     minRadius = 20
@@ -52,6 +52,7 @@ def main2():
     # Create circle template with radius r
 
     y_indexes, x_indexes = np.nonzero(edges)
+    correct_circles=[]
     for r in range(minRadius,maxRadius+1):
         accumulator = np.zeros(gray.shape, dtype=np.uint8)
         print(r)
@@ -65,16 +66,32 @@ def main2():
 
         # #hladanei najvacsich hodnot a nasledne zobrazovanie stredov
         cy,cx = np.where(accumulator >= threshold)
-        value = accumulator[cy,cx]
+        value = accumulator[cy,cx] #vektor
         # (cx, cy, r, value)
+        for i in range(len(cx)):
+            correct_circles.append((cx[i], cy[i], r, value[i]))
         # sorted_indices = np.argsort(accumulator, axis=None)
         # cy,cx = np.unravel_index(sorted_indices,accumulator.shape)
-
-
-        for x,y in zip(cx,cy):
-            # cv2.circle(accumulator,(x,y),1,(255,0,255),2)
-            cv2.circle(img, (x, y), 1, (255, 0, 255), 2)
-            cv2.circle(img, (x, y), r, (255, 0, 0), 2)
+    sorted_circles = sorted(correct_circles, key=lambda x: x[3], reverse=True)
+    new_circles = [sorted_circles[0]]  # add the element with the highest value to the new list
+    for i in range(1, len(sorted_circles)):
+        cx1, cy1, r1, val1 = sorted_circles[i]
+        add_circle = True
+        for j in range(len(new_circles)):
+            cx0, cy0, r0, val0 = new_circles[j]
+            dist = np.sqrt((cx1 - cx0) ** 2 + (cy1 - cy0) ** 2)
+            if dist < minDist:  # set your desired threshold here
+                if val1 < val0:
+                    add_circle = False
+        if add_circle:
+            new_circles.append(sorted_circles[i])
+    cx_list = [circle[0] for circle in new_circles]
+    cy_list = [circle[1] for circle in new_circles]
+    r_list = [circle[2] for circle in new_circles]
+    for x,y,r in zip(cx_list,cy_list,r_list):
+        # cv2.circle(accumulator,(x,y),1,(255,0,255),2)
+        cv2.circle(img, (x, y), 1, (255, 0, 255), 2)
+        cv2.circle(img, (x, y), r, (255, 0, 0), 2)
     # cv2.imshow('center', accumulator)
     cv2.imshow('center1', img)
     # print(idx)
