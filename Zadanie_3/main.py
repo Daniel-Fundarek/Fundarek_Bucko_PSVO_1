@@ -33,38 +33,58 @@ def main2():
     img = cv2.imread('circle1.jpg')
     cv2.imshow('original',img)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    scale = 1
+    delta = 0
+    ddepth = cv2.CV_16S
+    grad_x = cv2.Sobel(gray, ddepth, 1, 0, ksize=3, scale=scale, delta=delta, borderType=cv2.BORDER_DEFAULT)
+    # Gradient-Y
+    # grad_y = cv.Scharr(gray,ddepth,0,1)
+    grad_y = cv2.Sobel(gray, ddepth, 0, 1, ksize=3, scale=scale, delta=delta, borderType=cv2.BORDER_DEFAULT)
+
+
+    abs_grad_x = cv2.convertScaleAbs(grad_x)
+    abs_grad_y = cv2.convertScaleAbs(grad_y)
+    edges = cv2.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0)
+    cv2.imshow("sobel", edges)
+    cv2.waitKey(0)
+
+    # _, edges = cv2.threshold(edges,254,255,cv2.THRESH_BINARY)
+    # cv2.imshow("sobelx", abs_grad_x)
+    # cv2.imshow("sobely", abs_grad_y)
+    # cv2.imshow("sobel", abs_grad)
+    # # cv2.imshow("sobel", abs_grad)
+    #
+    # cv2.waitKey(0)
 
     # Apply GaussianBlur to reduce noise
     # gray = cv2.GaussianBlur(gray, (5, 5), 0)
 
     # Set the Hough Circle parameters
-    dp = 1
-    minDist = 150
-    param1 = 50
+    minDist = 50
     threshold = 75#20#75
-    minRadius = 20#180#20
-    maxRadius = 150#400#150
+    minRadius = 25#180#20
+    maxRadius = 135#400#150
     # r = 215
     accumulator = np.zeros(gray.shape, dtype=np.uint64)
-    edges = cv2.Canny(gray, 100, 200)
+    # edges = cv2.Canny(gray, 100, 200)
     # Apply the Hough Circle transform
     circles = []
     # Create circle template with radius r
-
-    y_indexes, x_indexes = np.nonzero(edges)
+    y_indexes, x_indexes = np.where(edges>180)
+    # y_indexes, x_indexes = np.nonzero(edges)
     correct_circles=[]
     for r in range(minRadius,maxRadius+1):
         accumulator = np.zeros(gray.shape, dtype=np.uint8)
         print(r)
         fill_accumulator(x_indexes, y_indexes, r, accumulator)
-        # uint8_accumulator_normalized = accumulator
-        # arr_normalized = (accumulator - accumulator.min()) / (accumulator.max() - accumulator.min())  # normalize array
-        # uint8_accumulator_normalized = (arr_normalized * 255).astype(np.uint8)  # scale down array
-        # cv2.imshow('convolved', uint8_accumulator_normalized)
-        # cv2.waitKey(0)
+        uint8_accumulator_normalized = accumulator
+        arr_normalized = (accumulator - accumulator.min()) / (accumulator.max() - accumulator.min())  # normalize array
+        uint8_accumulator_normalized = (arr_normalized * 255).astype(np.uint8)  # scale down array
+        cv2.imshow('convolved', uint8_accumulator_normalized)
+        cv2.waitKey(50)
         # print(np.sort(accumulator.flatten())[::-1][0:50])
 
-        # #hladanei najvacsich hodnot a nasledne zobrazovanie stredov
+        # false positive circle centre filtration
         cy,cx = np.where(accumulator >= threshold)
         value = accumulator[cy,cx] #vektor
         # (cx, cy, r, value)
