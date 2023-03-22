@@ -27,7 +27,61 @@ def fill_accumulator(x_indexes, y_indexes, r, accumulator):
         accumulator[ys_int, xs_int] += 1
 
 
+# Define the kernel
 
+def myConvolution(img, kernel):
+    # Get the dimensions of the image and the kernel
+    img_height, img_width = img.shape
+    kernel_height, kernel_width = kernel.shape
+
+    # Define an empty output image
+    output = np.zeros((img_height - kernel_height + 1, img_width - kernel_width + 1))
+
+    # Loop over each pixel in the output image
+    for i in range(output.shape[0]):
+        for j in range(output.shape[1]):
+            # Get the current patch of the image
+            patch = img[i:i + kernel_height, j:j + kernel_width]
+
+            # Perform the convolution operation
+            output[i, j] = np.sum(patch * kernel)
+
+    # Normalize the output image to [0, 255] range
+    #output = (output - np.min(output)) * 255 / (np.max(output) - np.min(output))
+
+    # Convert the output image to uint8 format
+    #output = output.astype(np.uint8)
+    return output
+
+
+def myAddWeighted(src1, alpha, src2, beta, gamma):
+    # Normalize the input arrays to [0, 1] range
+    src1_norm = src1.astype(np.float32) / 255.0
+    src2_norm = src2.astype(np.float32) / 255.0
+
+    # Perform the weighted addition
+    result_norm = alpha * src1_norm + beta * src2_norm + gamma
+
+    # Convert the result back to [0, 255] range
+    result = np.clip(result_norm * 255, 0, 255).astype(np.uint8)
+
+    return result
+
+
+def myConvertScaleAbs(src, alpha=1.0, beta=0.0):
+    # Scale the input array by alpha
+    scaled = src.astype(np.float32) * alpha
+
+    # Add the beta offset
+    scaled += beta
+
+    # Ensure that the values are within the [0, 255] range
+    scaled = np.clip(scaled, 0, 255)
+
+    # Convert the scaled array to the absolute representation
+    dst = scaled.round().astype(np.uint8)
+
+    return dst
 def main2():
     # Load the image and convert it to grayscale
     img = cv2.imread('circle1.jpg')
@@ -36,15 +90,21 @@ def main2():
     scale = 1
     delta = 0
     ddepth = cv2.CV_16S
-    grad_x = cv2.Sobel(gray, ddepth, 1, 0, ksize=3, scale=scale, delta=delta, borderType=cv2.BORDER_DEFAULT)
+    kernel_y = np.array([[1, 0, -1],
+                       [2, 0, -2],
+                       [1, 0, -1]])
+    kernel_x = np.array([[1, 2, 1],
+                       [0, 0, 0],
+                       [-1, -2, -1]])
+    grad_x = myConvolution(gray,kernel_x)
     # Gradient-Y
     # grad_y = cv.Scharr(gray,ddepth,0,1)
-    grad_y = cv2.Sobel(gray, ddepth, 0, 1, ksize=3, scale=scale, delta=delta, borderType=cv2.BORDER_DEFAULT)
+    grad_y = myConvolution(gray,kernel_y)
 
 
-    abs_grad_x = cv2.convertScaleAbs(grad_x)
-    abs_grad_y = cv2.convertScaleAbs(grad_y)
-    edges = cv2.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0)
+    abs_grad_x = myConvertScaleAbs(grad_x)
+    abs_grad_y = myConvertScaleAbs(grad_y)
+    edges = myAddWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0)
     cv2.imshow("sobel", edges)
     cv2.waitKey(0)
 
@@ -60,8 +120,8 @@ def main2():
     # gray = cv2.GaussianBlur(gray, (5, 5), 0)
 
     # Set the Hough Circle parameters
-    minDist = 50
-    threshold = 75#20#75
+    minDist = 150
+    threshold = 40#20#75
     minRadius = 25#180#20
     maxRadius = 135#400#150
     # r = 215
